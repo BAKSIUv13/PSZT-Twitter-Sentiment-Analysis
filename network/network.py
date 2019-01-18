@@ -8,10 +8,13 @@ class NeuralNetwork:
     _layer_sizes = None
     _neurons = None
     _connections = None
+
     def __init__(self):
         pass
+
     def clear_totally(self):
         """ This method erares all data of network."""
+
     def set_number_of_layers(self, number):
         """This method sets number of layers in network."""
         if ~isinstance(number, int):
@@ -25,6 +28,7 @@ class NeuralNetwork:
         self._neurons = [None] * number
         self._connections = [None] * (number - 1)
         # Connections are numbered is way that 0 means after 0 layer.
+
     def set_layer_size(self, which_layer, size):
         """This method sets quantity of neurons in indexed layer.
 
@@ -38,6 +42,7 @@ Layer 0 is input. Layer number - 1 is the output.
             return
         self._layer_sizes[which_layer] = size
         self._neurons[which_layer] = [0.0] * size
+
     def init_with_zeros(self):
         """This function shall create the neurons and their connections
 and everything that is necessary this network to work.
@@ -61,25 +66,49 @@ and everything that is necessary this network to work.
 This is not finished. Here I need to add derivatires somehow and I
 don't know how. It is temporary.
         """
+
     def randomize_weights(self):
         """This function randomizes all weights in all connections and biases.
         """
-    def fill_input(self, numbers):
+
+    def layer_get_one(self, layer, where):
+        """oldsfklodsk"""
+
+    def layer_set_one(self, layer, where, number):
+        """lkdsflkadsl"""
+
+    def layer_get_all(self, layer):
+        """ get whole layer xD """
+
+    def layer_set_all(self, layer, numbers):
+        """ ustawia warstwe"""
+
+    def input_set_all(self, numbers):
         """This function fills input.
 
 I do not know how yet. xD
         """
-    def get_input(self):
+        self.layer_set_all(0, numbers)
+
+    def input_get_all(self):
         """Returns some table of input numbers"""
-    def set_input_number(self, where, number):
+
+    def input_set_one(self, where, number):
         """Set one number in input."""
-    def get_input_number(self, where, number):
+
+    def input_get_one(self, where, number):
         """ygrdfgtr"""
+
     def calculate(self):
         """Calculate output from network with actual input."""
+
     def propagate_back(self, wanted_output):
         """This function makes network to learn using calculated output and
 wanted output.
         """
-    
 
+    def output_get_one(self, where):
+        """ This function read one indexed value from output."""
+
+    def output_get_all(self):
+        """ Whis function reads output."""
