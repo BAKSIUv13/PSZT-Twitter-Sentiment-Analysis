@@ -75,3 +75,11 @@ I do not know how yet. xD
         """Set one number in input."""
     def get_input_number(self, where, number):
         """ygrdfgtr"""
+    def calculate(self):
+        """Calculate output from network with actual input."""
+    def propagate_back(self, wanted_output):
+        """This function makes network to learn using calculated output and
+wanted output.
+        """
+    
+
