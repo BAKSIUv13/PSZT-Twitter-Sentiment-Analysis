@@ -1,2 +1,2 @@
 """ Information of modeules."""
-__all__ = ["network", "connections"]
+__all__ = ["network"]
