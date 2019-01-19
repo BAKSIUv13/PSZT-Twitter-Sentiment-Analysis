@@ -1,7 +1,9 @@
 """This module contains class of network."""
 
-from network import connections
 from random import uniform
+from enum import IntEnum
+
+from network import connections
 
 
 class NeuralNetwork:
@@ -19,6 +21,23 @@ class NeuralNetwork:
     def __init__(self):
         pass
 
+    def _check_network_readiness(self):
+        if ~isinstance(self._number_of_layers, int)
+                or self._number_of_layers < 1:
+            return False # no number of layers
+        if ~isinstance(self._layer_sizes, list)
+                or len(self._layer_sizes) != self._number_of_layers:
+            return False # layer sizes not set good, very bad
+        for i in self._layer_sizes:
+            if ~isinstance(i, int) or i < 1:
+                return False # layer sizes not set good, but not so bad
+        if ~isinstance(self._neurons, list)
+                or len(self._neurons) != self._number_of_layers:
+            return False # there is an error with layer sizes
+        for i, layer in enumerate(self._neurons):
+            if ~isinstance()
+        
+
     def clear_totally(self):
         """ This method erares all data of network."""
         self._number_of_layers = None
@@ -29,10 +48,8 @@ class NeuralNetwork:
 
     def set_number_of_layers(self, number):
         """This method sets number of layers in network."""
-        if ~isinstance(number, int):
-            return
-        if number < 1:
-            return
+        if ~isinstance(number, int) or number < 1:
+            raise ValueError("set_number_of_layers: expected positive int")
         self._neurons = None
         self._connections = None
         self._number_of_layers = number
@@ -42,19 +59,26 @@ class NeuralNetwork:
         self._connections = [None] * (number - 1)
         # Connections are numbered is way that 0 means after 0 layer.
 
+
     def set_layer_size(self, which_layer, size):
         """This method sets quantity of neurons in indexed layer.
 
 Layer 0 is input. Layer number - 1 is the output.
         """
-        if ~isinstance(which_layer, int) or ~isinstance(size, int):
-            return
+        if ~isinstance(which_layer, int):
+            raise ValueError("set_layer_size: expected 'which_layer' "
+                             + "as an int")
+        if ~isinstance(size, int):
+            raise ValueError("set_layer_size: expected 'size' as an int")
         if ~isinstance(self._number_of_layers, int):
-            return
+            raise ValueError("set_layer_size: number of layers is not set")
         if which_layer < 0 or which_layer >= self._number_of_layers:
-            return
+            raise ValueError("set_layer_size: 'which_layer' has to be in [0,"
+                             + self._number_of_layers
+                             + ")")
         if size < 1:
-            return
+            raise ValueError("set_layer_size: expected 'which_layer' as an "
+                             + "positive int")
         self._layer_sizes[which_layer] = size
         self._neurons[which_layer] = [0.0] * size
 
@@ -63,10 +87,12 @@ Layer 0 is input. Layer number - 1 is the output.
 and everything that is necessary this network to work.
         """
         if self._number_of_layers is None:
-            return
-        for i in self._layer_sizes:
-            if ~isinstance(i, int) or i < 1:
-                return
+            raise ValueError("init_with_zeros: number of layer not set")
+        for i, layer_size in self._layer_sizes:
+            if ~isinstance(layer_size, int) or layer_size < 1:
+                raise ValueError("init_with_zeros: layer "
+                                 + i
+                                 + "is not a positive int")
         for i in self._neurons:
             for j in range(self._layer_sizes[i]):
                 self._neurons[j] = 0.0
@@ -85,17 +111,29 @@ Layer means destination layer index + 1
 
 If function is not set this layer will be treated as linear (f(x)=x).
         """
-        if ~isinstance(layer, int) or ~callable(func):
-            return
+        if ~isinstance(layer, int):
+            raise ValueError("set_func: expected 'layer' as an int")
+        if ~callable(func):
+            raise ValueError("set_func: expected 'func' as a function")
         if ~isinstance(self._number_of_layers, int):
-            return
+            raise ValueError("set_func: number of layers is not set")
         if layer < 0 or layer >= self._number_of_layers - 1:
-            return
+            raise ValueError("set_func: expected 'layer' in [0,"
+                             + (self._number_of_layers - 1)
+                             + ")")
         self._layer_functions[layer] = func
 
     def randomize_weights(self, min_value, max_value):
         """This function randomizes all weights in all connections and biases.
         """
+        if ~isinstance(min_value, (float, int)) \
+                or ~isinstance(max_value, (float, int)):
+            raise ValueError("randomize_wights: expected 'min_value' and "
+                             + "'max_value' as floats or ints")
+        if min_value > max_value:
+            raise ValueError("randomize_wights: expected "
+                             + "min_value <= max_value")
+        if 
         for i in range(self._number_of_layers - 1):
             for j in range(len(self._connections[i])):
                 self._connections[i][j] = uniform(min_value, max_value)
@@ -106,7 +144,7 @@ If function is not set this layer will be treated as linear (f(x)=x).
 
     def layer_set_one(self, layer, where, number):
         """lkdsflkadsl"""
-        self._neurons[layer,where] = number
+        self._neurons[layer, where] = number
 
     def layer_get_all(self, layer):
         """ get whole layer xD """
@@ -114,8 +152,8 @@ If function is not set this layer will be treated as linear (f(x)=x).
 
     def layer_set_all(self, layer, numbers):
         """ ustawia warstwe"""
-        for i in range(len(numbers)):
-            self._neurons[layer][i] = numbers[i]
+        for i, number in enumerate(numbers):
+            self._neurons[layer][i] = number
 
     def input_set_all(self, numbers):
         """This function fills input.
@@ -148,7 +186,7 @@ I do not know how yet. xD
                 addition = self._neurons[in_layer][in_neuron]
                 if callable(func):
                     addition = func(addition)
-            addition = addition * get_connection_index(in_neuron, \
+            addition = addition * connections.get_connection_index(in_neuron, \
                 out_neuron, len(self._neurons[in_layer]))
             return addition
 
@@ -157,11 +195,11 @@ I do not know how yet. xD
                 value = 0.0
                 for i in range(len(self._neurons[in_layer]) + 1):
                     # + 1 because of bias
-                    value = value + one_addition(in_layer, i, j)
+                    value = value + one_addition(self, in_layer, i, j)
                 self._neurons[in_layer + 1][j] = value
 
         for i in range(self._number_of_layers - 1):
-            one_layer(i)
+            one_layer(self, i)
 
     def propagate_back(self, wanted_output):
         """This function makes network to learn using calculated output and

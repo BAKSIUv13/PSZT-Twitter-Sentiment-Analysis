@@ -5,7 +5,7 @@
 #
 #
 #
-def get_connetions_index(in_layer, out_layer, in_layer_size):
+def get_connection_index(in_layer, out_layer, in_layer_size):
     """ This functions calculates number of index of connection"""
     return in_layer + (in_layer_size + 1) * out_layer
 
