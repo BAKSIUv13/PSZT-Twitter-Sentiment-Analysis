@@ -3,15 +3,16 @@
 from random import uniform
 from enum import IntEnum
 
-def get_connection_index(in_neuron, out_neuron, in_layer_size):
+def connection_index(in_neuron, out_neuron, in_layer_size):
     """ This functions calculates number of index of connection"""
     #
-    # Indices are from 0 to 'size of layer' - 1. The 'size of layer' is the bias.
+    # Indices are from 0 to 'size of layer' - 1. The 'size of layer'
+    # is the bias.
     #
     return in_neuron + (in_layer_size + 1) * out_neuron
 
-def get_neuron_indices(index, in_layer_size):
-    """This function calculates number of neurons in layers from index
+def neuron_indices(index, in_layer_size):
+    """This function calculates indices of neurons in layers from index
 of connection.
 """
     return (index % (in_layer_size + 1), index / (in_layer_size + 1))
@@ -89,6 +90,11 @@ class NeuralNetwork:
         self._connections = [None] * (number - 1)
         self._setup_level = NetworkSetupLevel.LAYERS_NUMBER
         # Connections are numbered is way that 0 means after 0 layer.
+
+    def get_number_of_layers(self):
+        """This method returns number of layers in network."""
+        self.check_level(NetworkSetupLevel.LAYERS_NUMBER)
+        return self._number_of_layers
 
     def set_layer_size(self, which_layer, size):
         """This method sets quantity of neurons in indexed layer.
@@ -175,15 +181,7 @@ If function is not set this layer will be treated as const (f(x)=1).
         self._layer_derivatives[which_layer] = func
 
     def randomize_weights(self, min_value, max_value):
-        """This function randomizes all weights in all connections and biases.
-        """
-        #if not isinstance(min_value, (float, int)) \
-        #        or not isinstance(max_value, (float, int)):
-        #    raise ValueError("expected 'min_value' and "
-        #                     + "'max_value' as floats or ints")
-        #if min_value > max_value:
-        #    raise ValueError("expected "
-        #                     + "min_value <= max_value")
+        """Randomizes all weights in all connections and biases."""
         self.check_level(NetworkSetupLevel.READY)
         for i in range(self._number_of_layers - 1):
             for j in range(len(self._connections[i])):
@@ -210,6 +208,16 @@ If function is not set this layer will be treated as const (f(x)=1).
         for i, number in enumerate(numbers):
             self._neurons[layer][i] = number
 
+    def connection_get(self, in_layer, index):
+        """Returns value of connection at given index."""
+        self.check_level(NetworkSetupLevel.READY)
+        return self._connections[in_layer][index]
+
+    def connection_set(self, in_layer, index, value):
+        """Sets the value of the connection at given index."""
+        self.check_level(NetworkSetupLevel.READY)
+        self._connections[in_layer][index] = value
+
     def input_set_all(self, numbers):
         """This function fills input."""
         self.layer_set_all(0, numbers)
@@ -229,7 +237,7 @@ If function is not set this layer will be treated as const (f(x)=1).
     def calculate(self):
         """Calculate output from network with actual input."""
         def weight(self, in_layer, in_neuron, out_neuron):
-            return self._connections[in_layer][get_connection_index(in_neuron,\
+            return self._connections[in_layer][connection_index(in_neuron,\
                 out_neuron, len(self._neurons[in_layer]))]
 
         def one_addition(self, in_layer, in_neuron, out_neuron):
@@ -260,6 +268,7 @@ If function is not set this layer will be treated as const (f(x)=1).
 wanted output.
         """
         self.check_level(NetworkSetupLevel.READY)
+
         wanted_output = 1
         wanted_output = wanted_output + 1
 
