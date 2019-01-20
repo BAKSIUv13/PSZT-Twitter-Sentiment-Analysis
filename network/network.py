@@ -218,6 +218,34 @@ If function is not set this layer will be treated as const (f(x)=1).
         self.check_level(NetworkSetupLevel.READY)
         self._connections[in_layer][index] = value
 
+    def serialize_weights(self):
+        """This function makes a list of weights of connections.
+
+This list can be saved to file.
+        """
+        self.check_level(NetworkSetupLevel.READY)
+        length = 0
+        for connection_layer in self._connections:
+            length = length + len(connection_layer)
+        the_list = [0.0] * length
+        index = 0
+        for _, connection_layer in enumerate(self._connections):
+            for _, connection in enumerate(connection_layer):
+                the_list[index] = connection
+                index = index + 1
+        return the_list
+
+    def paste_weights(self, weights):
+        """This functions sets all connections from a list."""
+        self.check_level(NetworkSetupLevel.READY)
+        index = 0
+        for _, connection_layer in enumerate(self._connections):
+            for j, _ in enumerate(connection_layer):
+#                print("Ok, Connection: layer {:4d}, index {:4d}, and index \
+#in list {:4d}, value: {:5.5f}".format(i, j, index, weights[index]))
+                connection_layer[j] = weights[index]
+                index = index + 1
+
     def input_set_all(self, numbers):
         """This function fills input."""
         self.layer_set_all(0, numbers)
@@ -263,15 +291,6 @@ If function is not set this layer will be treated as const (f(x)=1).
         for i in range(self._number_of_layers - 1):
             one_layer(self, i)
 
-    def propagate_back(self, wanted_output):
-        """This function makes network to learn using calculated output and
-wanted output.
-        """
-        self.check_level(NetworkSetupLevel.READY)
-
-        wanted_output = 1
-        wanted_output = wanted_output + 1
-
     def output_get_one(self, where):
         """ This function read one indexed value from output."""
         return self.layer_get_one(self._number_of_layers - 1, where)
@@ -280,3 +299,17 @@ wanted output.
         """ Whis function reads output."""
         print(self._number_of_layers - 1)
         return self.layer_get_all(self._number_of_layers - 1)
+
+    def propagate_back(self, wanted_output):
+        """This function makes network to learn using calculated output and
+wanted output.
+        """
+        self.check_level(NetworkSetupLevel.READY)
+
+        output_index = self.get_number_of_layers() - 1
+        output_size = self.get_layer_size(output_index)
+        # less writing
+
+        err = [0.0] * output_size
+        for i, neuron in enumerate(self.layer_get_all(output_index)):
+            err[i] = wanted_output[i] - neuron
