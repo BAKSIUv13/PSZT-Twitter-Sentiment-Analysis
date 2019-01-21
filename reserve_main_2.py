@@ -9,10 +9,6 @@ from network import network
 from network import utility as u
 
 
-SPEED = 0.016
-
-ITERATIONS = 3600
-
 def hidden_func(argus):
     """Function"""
     return math.atan(argus)
@@ -30,9 +26,6 @@ OUT_SET_2 = [0.0, -0.45]
 OUT_SET_3 = [0.7, 0.65]
 OUT_SET_4 = [0.0, 0.45]
 
-print("Start test of learning with speed = {:3.3f} and {:3d} iterations."\
-      .format(SPEED, ITERATIONS))
-
 NET = network.NeuralNetwork()
 
 NET.set_number_of_layers(3)
@@ -45,26 +38,9 @@ NET.set_derivative(0, hidden_derivative)
 
 NET.init_with_zeros()
 
-NET.randomize_weights(-1.0, 1.0)
+u.load_from_file(NET, 'pliczek')
 
 print(u.calculate(NET, IN_SET_1))
 print(u.calculate(NET, IN_SET_2))
 print(u.calculate(NET, IN_SET_3))
 print(u.calculate(NET, IN_SET_4))
-
-u.full_learning(
-    NET,
-    [IN_SET_1, IN_SET_2, IN_SET_3, IN_SET_4],
-    [OUT_SET_1, OUT_SET_2, OUT_SET_3, OUT_SET_4],
-    SPEED,
-    ITERATIONS
-    )
-
-
-print(u.calculate(NET, IN_SET_1))
-print(u.calculate(NET, IN_SET_2))
-print(u.calculate(NET, IN_SET_3))
-print(u.calculate(NET, IN_SET_4))
-
-
-u.save_to_file(NET, 'pliczek')
