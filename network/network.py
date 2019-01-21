@@ -55,7 +55,7 @@ class NeuralNetwork:
         self._number_of_layers = None
         self._layer_sizes = None
         self._layer_functions = None
-        self._layer_derivatives = None # hmm... it is only sugestion now
+        self._layer_derivatives = None
         self._neurons = None
         self._connections = None
         self._setup_level = NetworkSetupLevel.BLANK
@@ -256,8 +256,6 @@ This list can be saved to file.
         index = 0
         for _, connection_layer in enumerate(self._connections):
             for j, _ in enumerate(connection_layer):
-#                print("Ok, Connection: layer {:4d}, index {:4d}, and index \
-#in list {:4d}, value: {:5.5f}".format(i, j, index, weights[index]))
                 connection_layer[j] = weights[index]
                 index = index + 1
 
@@ -310,22 +308,16 @@ This list can be saved to file.
 
     def output_get_all(self):
         """ Whis function reads output."""
-        #print(self._number_of_layers - 1)
         return self.layer_get_all(self._number_of_layers - 1)
 
     def copy_weights(self):
         """This function copies actual state of weights."""
         self.check_level(NetworkSetupLevel.READY)
-        #print("copy")
-        #number_of_layers = self._number_of_layers
-        #number_of_passes = number_of_layers - 1
         weights = []
         for i, layer in enumerate(self._connections):
             weights.append([])
             for _, value in enumerate(layer):
                 weights[i].append(value)
-        #        print("{:2d} {:2d}".format(i, j))
-        #print("end copy")
         return weights
 
     def paste_weights(self, weights):
@@ -347,7 +339,6 @@ can be used to learn this network.
 
     def _create_empty_gradient(self):
         """This function creates a zero gradient for other functions"""
-        #self.check_level(NetworkSetupLevel.Ready)
         number_of_layers = self._number_of_layers
         number_of_passes = number_of_layers - 1
         gradient = [None] * number_of_passes
@@ -363,11 +354,8 @@ can be used to learn this network.
     def _propagate_gradient(self, wanted_output):
         """This functions calculates gradient of actual state and given wanted
 output."""
-        #self.check_level(NetworkSetupLevel.Ready)
-
         number_of_layers = self._number_of_layers
         last_layer_index = number_of_layers - 1
-        #number_of_passes = number_of_layers - 1
         last_pass_index = number_of_layers - 2
         neurons = self._neurons
 
@@ -435,22 +423,14 @@ output."""
 def merge_weight_sets(sets, multiplier):
     """Function that merges multiple weight or gradient sets and multiplies
 them by some number."""
-    #print("merge_weight_sets")
-    #print("multiplier " + str(multiplier))
-    #print("sets size " + str(len(sets)))
     final_set = []
-    #print("first set layers "+str(len(sets[0])))
     for layer in sets[0]:
         final_set.append(layer.copy())
-    #    print("layer size " + str(len(layer)))
     for i in range(1, len(sets)):
-    #    print("set " + str(i) + " layers " + str(len(sets[i])))
         for j, layer in enumerate(sets[i]):
-    #        print("layer size " + str(len(layer)))
             for k, value in enumerate(layer):
                 final_set[j][k] += value
     for _, layer in enumerate(final_set):
         for i, _ in enumerate(layer):
             layer[i] *= multiplier
-    #print("merge_weight_sets end")
     return final_set
