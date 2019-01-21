@@ -5,9 +5,7 @@ less."""
 
 def calculate(net, input_set):
     """This function feeds the network and returns its output."""
-    net.input_set_all(input_set)
-    net.feed()
-    return net.output_get_all()
+    return net.get_calculation(input_set)
 
 def full_learning(
         net,
@@ -16,7 +14,7 @@ def full_learning(
         speed,
         iterations_quantity
         ):
-    """This function fires a loop that teaches our network with given set."""
+    """This function does a loop that teaches our network with given set."""
     for i in range(iterations_quantity):
         net.learn(input_sets, expectations, speed)
         meh = net.look_for_nans()
@@ -32,7 +30,7 @@ def load_from_file(
         net,
         file_path
         ):
-    """This function load enitire weight vector to network from file."""
+    """This function load entire weight vector to network from file."""
     serialized = []
     with open(file_path, 'r') as the_file:
         file_content = the_file.readlines()

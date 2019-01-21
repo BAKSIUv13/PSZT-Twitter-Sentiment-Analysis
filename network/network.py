@@ -9,7 +9,7 @@ def cost(y_got, y_wanted):
     return 0.5 * (y_got - y_wanted)**2
 
 def cost_derivative(y_got, y_wanted):
-    """Derivative of the cost. xD Nobody expected the derivative."""
+    """This function calculates derivative of the cost."""
     return y_got - y_wanted
 
 def connection_index(in_neuron, out_neuron, in_layer_size):
@@ -47,11 +47,9 @@ too.
         # work.
 
 class NeuralNetwork:
-    """
-    This is class which stores all information about the network
-    and has its state.
-    """
-
+    """This is class which stores all information about the network
+and its state.
+"""
     def __init__(self):
         self._number_of_layers = None
         self._layer_sizes = None
@@ -62,7 +60,10 @@ class NeuralNetwork:
         self._setup_level = NetworkSetupLevel.BLANK
 
     def check_level(self, level):
-        """Check that setup level is sush or greater."""
+        """Checks that setup level is sush or greater.
+
+Raises an exception otherwise.
+"""
         if self._setup_level < level:
             raise ValueError("expected network setup level "
                              + str(level)
@@ -71,7 +72,7 @@ class NeuralNetwork:
 
 
     def clear_totally(self):
-        """ This method erares all data of network."""
+        """This method erares all data of network."""
         self._number_of_layers = None
         self._layer_sizes = None
         self._layer_functions = None
@@ -106,14 +107,12 @@ class NeuralNetwork:
 Layer 0 is input. Layer number - 1 is the output.
         """
         if not isinstance(which_layer, int):
-            raise ValueError("expected 'which_layer' "
-                             + "as an int")
+            raise ValueError("expected 'which_layer' as an int")
         if not isinstance(size, int):
             raise ValueError("expected 'size' as an int")
         if which_layer < 0 or which_layer >= self._number_of_layers:
-            raise ValueError("'which_layer' has to be in [0,"
-                             + str(self._number_of_layers)
-                             + ")")
+            raise ValueError("'which_layer' has to be in [0,{:d})"\
+                                    .format(self._number_of_layers))
         if size < 1:
             raise ValueError("expected 'which_layer' as an positive int")
 
@@ -123,7 +122,7 @@ Layer 0 is input. Layer number - 1 is the output.
         self._neurons[which_layer] = [0.0] * size
 
     def get_layer_size(self, which_layer):
-        """This function returns size of picked layer.
+        """This function returns size of indicated layer.
 
 If the layer has not its size set or it can't even have the size, exception is
 thrown.
@@ -132,13 +131,12 @@ thrown.
             raise ValueError("expected 'which_layer' as an int")
         self.check_level(NetworkSetupLevel.LAYERS_NUMBER)
         if which_layer < 0 or which_layer >= self._number_of_layers:
-            raise ValueError("'which_layer' has to be in [0,"
-                             + self._number_of_layers
-                             + ")")
+            raise ValueError("'which_layer' has to be in [0,{:d})"\
+                                    .format(self._number_of_layers))
         size = self._layer_sizes[which_layer]
         if isinstance(size, int):
             return size
-        raise ValueError("size of layer " + which_layer + "is not set")
+        raise ValueError("size of layer {:d} is not set".format(which_layer))
 
     def init_with_zeros(self):
         """This function shall create the neurons and their connections
@@ -157,13 +155,9 @@ and everything that is necessary this network to work.
         self._setup_level = NetworkSetupLevel.READY
 
     def set_function(self, which_layer, func):
-        """This function is to set the function between layer 'layer' and next.
+        """This function sets the function between layer 'layer' and next.
 
-This is not finished. Here I need to add derivatires somehow and I
-don't know how. It is temporary.
-
-Layer means destination layer index + 1
-
+Layer means destination layer index + 1.
 If function is not set this layer will be treated as linear (f(x)=x).
         """
         if not callable(func):
@@ -172,11 +166,9 @@ If function is not set this layer will be treated as linear (f(x)=x).
         self._layer_functions[which_layer] = func
 
     def set_derivative(self, which_layer, func):
-        """This function is to set the derivative between layer 'layer'
-and next.
+        """This function sets the derivative between layer 'layer' and next.
 
 Layer means destination layer index + 1
-
 If function is not set this layer will be treated as const (f(x)=1).
         """
         if not callable(func):
@@ -185,12 +177,18 @@ If function is not set this layer will be treated as const (f(x)=1).
         self._layer_derivatives[which_layer] = func
 
     def _func(self, in_layer, param):
+        """Calls the function between layers on param if it exists. Otherwise
+returns param as linear function.
+"""
         function = self._layer_functions[in_layer]
         if callable(function):
             return function(param)
         return param
 
     def _derivative(self, in_layer, param):
+        """Calls the derivative between layers on param if it exists. Otherwise
+returns 1.0.
+"""
         function = self._layer_derivatives[in_layer]
         if callable(function):
             return function(param)
@@ -204,12 +202,12 @@ If function is not set this layer will be treated as const (f(x)=1).
                 self._connections[i][j] = uniform(min_value, max_value)
 
     def layer_get_one(self, layer, where):
-        """Returns value stored by indicated neuron"""
+        """Returns value stored by indicated neuron."""
         self.check_level(NetworkSetupLevel.READY)
         return self._neurons[layer][where]
 
     def layer_set_one(self, layer, where, number):
-        """Sets value of indicated neuron"""
+        """Sets value of indicated neuron."""
         self.check_level(NetworkSetupLevel.READY)
         self._neurons[layer, where] = number
 
@@ -265,7 +263,7 @@ This list can be saved to file.
         self.layer_set_all(0, numbers)
 
     def input_get_all(self):
-        """Returns table of input numbers"""
+        """Returns table of input numbers."""
         self.layer_get_all(0)
 
     def input_set_one(self, where, number):
@@ -304,11 +302,11 @@ This list can be saved to file.
             one_layer(self, i)
 
     def output_get_one(self, where):
-        """ This function read one indexed value from output."""
+        """This function reads one indicated value from output."""
         return self.layer_get_one(self._number_of_layers - 1, where)
 
     def output_get_all(self):
-        """ Whis function reads output."""
+        """This function reads output."""
         return self.layer_get_all(self._number_of_layers - 1)
 
     def copy_weights(self):
@@ -322,7 +320,7 @@ This list can be saved to file.
         return weights
 
     def paste_weights(self, weights):
-        """This function sets values of all weights"""
+        """This function sets values of all weights."""
         self.check_level(NetworkSetupLevel.READY)
         for i, layer in enumerate(weights):
             for j, value in enumerate(layer):
@@ -339,7 +337,7 @@ can be used to learn this network.
         return self._propagate_gradient(wanted_output)
 
     def _create_empty_gradient(self):
-        """This function creates a zero gradient for other functions"""
+        """This function creates a zero gradient for other functions."""
         number_of_layers = self._number_of_layers
         number_of_passes = number_of_layers - 1
         gradient = [None] * number_of_passes
@@ -348,7 +346,7 @@ can be used to learn this network.
         return gradient
 
     def create_empty_gradient(self):
-        """Returns zero gradient"""
+        """Returns zero gradient."""
         self.check_level(NetworkSetupLevel.READY)
         return self._create_empty_gradient()
 
@@ -405,7 +403,7 @@ output."""
         return self.output_get_all()
 
     def learn(self, input_sets, expectations, gradient_multiplier):
-        """Function that lears our network."""
+        """Function that learns our network."""
         calculated_gradients = []
         for i, in_set in enumerate(input_sets):
             self.input_set_all(in_set)
@@ -422,7 +420,7 @@ output."""
         self.paste_weights(gradient)
 
     def look_for_nans(self):
-        """Function that returns list of places witch nans i the network."""
+        """Function that returns list of places with nans i the network."""
         the_list = []
         for i, layer in enumerate(self._neurons):
             for j, neuron in enumerate(layer):
