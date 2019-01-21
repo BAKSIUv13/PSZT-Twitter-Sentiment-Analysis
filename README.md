@@ -13,3 +13,4 @@ To activate PSZT-Twitter-Sentiment-Analysis-env:
 To install requirements:
 
 `pip install -r requirements.txt`
+
