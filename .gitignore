@@ -1,3 +1,4 @@
+
 *.o
 *.exe
 *.a
@@ -8,3 +9,9 @@
 .vscode
 
 __pycache__
+
+.vscode/
+PSZT-Twitter-Sentiment-Analysis-env
+__pycache__/
+secrets
+
