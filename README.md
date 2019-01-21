@@ -18,4 +18,4 @@ To install requirements:
 
 To run the program (trump hashtag example):
 
-`./main.py trump`
+`./main.py trump SECRET_ONE SECRET_TWO`
