@@ -9,5 +9,13 @@ def calculate(net, input_set):
     net.feed()
     return net.output_get_all()
 
-def fgh():
-    pass
+def full_learning(
+        net,
+        input_sets,
+        expectations,
+        speed,
+        iterations_quantity
+        ):
+    """This function fires a loop that teaches our network with given set."""
+    for _ in range(iterations_quantity):
+        net.learn(input_sets, expectations, speed)

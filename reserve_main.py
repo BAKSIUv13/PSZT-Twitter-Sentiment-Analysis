@@ -4,7 +4,10 @@ Almost main script
 
 """
 
+import math
+
 from network import network
+from network import utility as u
 
 print(5+6+7)
 
@@ -12,19 +15,37 @@ print(5+6+7)
 
 CI = network.connection_index
 
-SPEED = 0.01
+SPEED = 0.00315
 
-ITERATIONS = 100
+ITERATIONS = 8000
+
+def hidden_func(argus):
+    """Function"""
+    return math.atan(argus)
+    #if argus > 0.0:
+    #    return argus
+    #return 0.0
+
+def hidden_derivative(argus):
+    """Function derivative."""
+    return 1.0 / (argus**2 + 1.0)
+    #if argus > 0.0:
+    #    return 1.0
+    #return 0.0
 
 IN_SET_1 = [0.1, 3.2, 0.5]
 IN_SET_2 = [6.3, 0.0, -3.0]
-IN_SET_3 = [0.15, 3.33, 0.6]
+IN_SET_3 = [0.55, 4.33, 0.6]
+IN_SET_4 = [0.0, 0.0, -0.5]
 OUT_SET_1 = [1.0, 3.3]
 OUT_SET_2 = [0.0, -0.45]
+OUT_SET_3 = [0.7, 0.65]
+OUT_SET_4 = [0.0, 0.45]
 
 print("Start test of learning with speed = {:3.3f} and {:3d} iterations."\
       .format(SPEED, ITERATIONS))
 
+'''
 QWE = []
 
 with open('file.txt', 'r') as filee:
@@ -35,22 +56,42 @@ with open('file.txt', 'r') as filee:
         QWE.append(float(curr))
 
 print(QWE)
+'''
 
 
 NET = network.NeuralNetwork()
 
 
-NET.set_number_of_layers(3)
+NET.set_number_of_layers(6)
 NET.set_layer_size(0, 3)
-NET.set_layer_size(1, 5)
-NET.set_layer_size(2, 2)
+NET.set_layer_size(1, 6)
+NET.set_layer_size(2, 8)
+NET.set_layer_size(3, 6)
+NET.set_layer_size(4, 5)
+NET.set_layer_size(5, 2)
+
+NET.set_function(0, hidden_func)
+NET.set_derivative(0, hidden_derivative)
+
+NET.set_function(1, hidden_func)
+NET.set_derivative(1, hidden_derivative)
+
+NET.set_function(2, hidden_func)
+NET.set_derivative(2, hidden_derivative)
+
+NET.set_function(3, hidden_func)
+NET.set_derivative(3, hidden_derivative)
+
+NET.set_function(4, hidden_func)
+NET.set_derivative(4, hidden_derivative)
+
 NET.init_with_zeros()
 #for i in range(NET.get_number_of_layers()):
 #    print(NET.layer_get_all(i))
 
-NET.paste_serialized_weights(QWE)
+#NET.paste_serialized_weights(QWE)
 
-#NET.randomize_weights(-1, 0)
+NET.randomize_weights(-1.0, 1.0)
 #NET.connection_set(1, CI(5, 0, 5), 2.0)
 #QWE = NET.serialize_weights()
 
@@ -61,33 +102,26 @@ NET.paste_serialized_weights(QWE)
 #for i in range(NET.get_number_of_layers()):
 #    print(NET.layer_get_all(i))
 
-NET.input_set_all(IN_SET_1)
-NET.feed()
-print(NET.output_get_all())
 
-NET.input_set_all(IN_SET_2)
-NET.feed()
-print(NET.output_get_all())
+print(u.calculate(NET, IN_SET_1))
+print(u.calculate(NET, IN_SET_2))
+print(u.calculate(NET, IN_SET_3))
+print(u.calculate(NET, IN_SET_4))
 
-NET.input_set_all(IN_SET_3)
-NET.feed()
-print(NET.output_get_all())
+u.full_learning(
+    NET,
+    [IN_SET_1, IN_SET_2, IN_SET_3, IN_SET_4],
+    [OUT_SET_1, OUT_SET_2, OUT_SET_3, OUT_SET_4],
+    SPEED,
+    ITERATIONS
+    )
 
-for i in range(ITERATIONS):
-    NET.learn([IN_SET_1, IN_SET_2], [OUT_SET_1, OUT_SET_2], SPEED)
 
+print(u.calculate(NET, IN_SET_1))
+print(u.calculate(NET, IN_SET_2))
+print(u.calculate(NET, IN_SET_3))
+print(u.calculate(NET, IN_SET_4))
 
-NET.input_set_all(IN_SET_1)
-NET.feed()
-print(NET.output_get_all())
-
-NET.input_set_all(IN_SET_2)
-NET.feed()
-print(NET.output_get_all())
-
-NET.input_set_all(IN_SET_3)
-NET.feed()
-print(NET.output_get_all())
 
 #print("======")
 

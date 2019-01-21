@@ -165,7 +165,7 @@ Layer means destination layer index + 1
 
 If function is not set this layer will be treated as linear (f(x)=x).
         """
-        if ~callable(func):
+        if not callable(func):
             raise ValueError("expected 'func' as a function")
         self.check_level(NetworkSetupLevel.LAYERS_NUMBER)
         self._layer_functions[which_layer] = func
@@ -178,7 +178,7 @@ Layer means destination layer index + 1
 
 If function is not set this layer will be treated as const (f(x)=1).
         """
-        if ~callable(func):
+        if not callable(func):
             raise ValueError("expected 'func' as a function")
         self.check_level(NetworkSetupLevel.LAYERS_NUMBER)
         self._layer_derivatives[which_layer] = func
