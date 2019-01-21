@@ -14,3 +14,8 @@ To install requirements:
 
 `pip install -r requirements.txt`
 
+## Running the program
+
+To run the program (trump hashtag example):
+
+`./main.py trump`
