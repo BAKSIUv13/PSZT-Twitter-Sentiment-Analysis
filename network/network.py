@@ -2,6 +2,7 @@
 
 from random import uniform
 from enum import IntEnum
+import math
 
 def cost(y_got, y_wanted):
     """This function calculates the cost."""
@@ -23,7 +24,7 @@ def neuron_indices(index, in_layer_size):
     """This function calculates indices of neurons in layers from index
 of connection.
 """
-    return (index % (in_layer_size + 1), index / (in_layer_size + 1))
+    return (index % (in_layer_size + 1), index // (in_layer_size + 1))
 
 def number_of_connections(in_layer_size, out_layer_size):
     """Returns number of connections between layers including bias."""
@@ -419,6 +420,33 @@ output."""
             1.0
             )
         self.paste_weights(gradient)
+
+    def look_for_nans(self):
+        """Function that returns list of places witch nans i the network."""
+        the_list = []
+        for i, layer in enumerate(self._neurons):
+            for j, neuron in enumerate(layer):
+                if math.isnan(neuron):
+                    the_list.append("neuron:{:3d}:{:3d}:nan".format(i, j))
+                elif math.isinf(neuron):
+                    the_list.append("neuron:{:3d}:{:3d}:inf".format(i, j))
+        for i, layer in enumerate(self._connections):
+            for j, connection in enumerate(layer):
+                if math.isnan(connection):
+                    the_list.append("connection:{:3d}:{:3d}:{:3d}:nan"\
+                        .format(
+                            i,
+                            neuron_indices(j, self._layer_sizes[i])[0],
+                            neuron_indices(j, self._layer_sizes[i])[1]
+                            ))
+                elif math.isinf(connection):
+                    the_list.append("connection:{:3d}:{:3d}:{:3d}:inf"\
+                        .format(
+                            i,
+                            neuron_indices(j, self._layer_sizes[i])[0],
+                            neuron_indices(j, self._layer_sizes[i])[1]
+                            ))
+        return the_list
 
 def merge_weight_sets(sets, multiplier):
     """Function that merges multiple weight or gradient sets and multiplies

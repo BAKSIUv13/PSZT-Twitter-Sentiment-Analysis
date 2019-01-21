@@ -17,8 +17,16 @@ def full_learning(
         iterations_quantity
         ):
     """This function fires a loop that teaches our network with given set."""
-    for _ in range(iterations_quantity):
+    for i in range(iterations_quantity):
         net.learn(input_sets, expectations, speed)
+        meh = net.look_for_nans()
+        if meh:
+            print("Found nan in {:5d} iteration:(".format(i))
+            for where in meh:
+                print(where)
+            return
+        if i % 100 == 0:
+            print("Learning: {:5} iterations passed.".format(i))
 
 def load_from_file(
         net,
