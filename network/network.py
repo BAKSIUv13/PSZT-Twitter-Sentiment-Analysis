@@ -3,6 +3,14 @@
 from random import uniform
 from enum import IntEnum
 
+def cost(y_got, y_wanted):
+    """This function calculates the cost."""
+    return 0.5 * (y_got - y_wanted)**2
+
+def cost_derivative(y_got, y_wanted):
+    """Derivative of the cost. xD Nobody expected the derivative."""
+    return y_got - y_wanted
+
 def connection_index(in_neuron, out_neuron, in_layer_size):
     """ This functions calculates number of index of connection"""
     #
@@ -36,11 +44,6 @@ too.
     READY = 1
         # All layers have sizes and connections are made. Network is ready to
         # work.
-    FILLED = 2
-        # I don't know if we need it.
-    #def __str__(self):
-    #    return self.value
-
 
 class NeuralNetwork:
     """
@@ -180,6 +183,18 @@ If function is not set this layer will be treated as const (f(x)=1).
         self.check_level(NetworkSetupLevel.LAYERS_NUMBER)
         self._layer_derivatives[which_layer] = func
 
+    def _func(self, in_layer, param):
+        function = self._layer_functions[in_layer]
+        if callable(function):
+            return function(param)
+        return param
+
+    def _derivative(self, in_layer, param):
+        function = self._layer_derivatives[in_layer]
+        if callable(function):
+            return function(param)
+        return 1.0
+
     def randomize_weights(self, min_value, max_value):
         """Randomizes all weights in all connections and biases."""
         self.check_level(NetworkSetupLevel.READY)
@@ -235,7 +250,7 @@ This list can be saved to file.
                 index = index + 1
         return the_list
 
-    def paste_weights(self, weights):
+    def paste_serialized_weights(self, weights):
         """This functions sets all connections from a list."""
         self.check_level(NetworkSetupLevel.READY)
         index = 0
@@ -262,20 +277,18 @@ This list can be saved to file.
         """Returns number in input layer."""
         self.layer_get_one(0, where)
 
-    def calculate(self):
+    def feed(self):
         """Calculate output from network with actual input."""
         def weight(self, in_layer, in_neuron, out_neuron):
             return self._connections[in_layer][connection_index(in_neuron,\
                 out_neuron, len(self._neurons[in_layer]))]
 
         def one_addition(self, in_layer, in_neuron, out_neuron):
-            func = self._layer_functions[in_layer]
             if in_neuron == len(self._neurons[in_layer]):
                 addition = 1.0
             else:
                 addition = self._neurons[in_layer][in_neuron]
-                if callable(func):
-                    addition = func(addition)
+                addition = self._func(in_layer, addition)
             addition = addition * weight(self, in_layer, in_neuron, out_neuron)
             return addition
 
@@ -297,19 +310,147 @@ This list can be saved to file.
 
     def output_get_all(self):
         """ Whis function reads output."""
-        print(self._number_of_layers - 1)
+        #print(self._number_of_layers - 1)
         return self.layer_get_all(self._number_of_layers - 1)
 
-    def propagate_back(self, wanted_output):
-        """This function makes network to learn using calculated output and
-wanted output.
-        """
+    def copy_weights(self):
+        """This function copies actual state of weights."""
         self.check_level(NetworkSetupLevel.READY)
+        #print("copy")
+        #number_of_layers = self._number_of_layers
+        #number_of_passes = number_of_layers - 1
+        weights = []
+        for i, layer in enumerate(self._connections):
+            weights.append([])
+            for _, value in enumerate(layer):
+                weights[i].append(value)
+        #        print("{:2d} {:2d}".format(i, j))
+        #print("end copy")
+        return weights
 
-        output_index = self.get_number_of_layers() - 1
-        output_size = self.get_layer_size(output_index)
-        # less writing
+    def paste_weights(self, weights):
+        """This function sets values of all weights"""
+        self.check_level(NetworkSetupLevel.READY)
+        for i, layer in enumerate(weights):
+            for j, value in enumerate(layer):
+                self._connections[i][j] = value
 
-        err = [0.0] * output_size
-        for i, neuron in enumerate(self.layer_get_all(output_index)):
-            err[i] = wanted_output[i] - neuron
+    def propagate_back(self, wanted_output):
+        """This functions calculates gradient of actual state and given wanted
+output.
+
+Output of this function can be used to calculate average gradient and next it
+can be used to learn this network.
+"""
+        self.check_level(NetworkSetupLevel.READY)
+        return self._propagate_gradient(wanted_output)
+
+    def _create_empty_gradient(self):
+        """This function creates a zero gradient for other functions"""
+        #self.check_level(NetworkSetupLevel.Ready)
+        number_of_layers = self._number_of_layers
+        number_of_passes = number_of_layers - 1
+        gradient = [None] * number_of_passes
+        for i, _ in enumerate(gradient):
+            gradient[i] = [0.0] * len(self._connections[i])
+        return gradient
+
+    def create_empty_gradient(self):
+        """Returns zero gradient"""
+        self.check_level(NetworkSetupLevel.READY)
+        return self._create_empty_gradient()
+
+    def _propagate_gradient(self, wanted_output):
+        """This functions calculates gradient of actual state and given wanted
+output."""
+        #self.check_level(NetworkSetupLevel.Ready)
+
+        number_of_layers = self._number_of_layers
+        last_layer_index = number_of_layers - 1
+        #number_of_passes = number_of_layers - 1
+        last_pass_index = number_of_layers - 2
+        neurons = self._neurons
+
+        grad = self._create_empty_gradient()
+        temp_layer_l = [] # Used to store multiplied values
+        temp_layer_r = [] # It is the same thing, but from earlier layers
+        # Right temporary layer stores the sum of all derivatives of cost over
+        # all connections on the right side of responding neuron.
+
+        for i, out_neuron_value in enumerate(neurons[last_layer_index]):
+            temp_layer_r.append(\
+                cost_derivative(out_neuron_value, wanted_output[i]))
+        # Here we set needed values in right temp layer that will be used later.
+
+        for layer in range(last_pass_index, -1, -1):
+            temp_layer_l = [0.0] * len(neurons[layer])
+            layer_size = self._layer_sizes[layer]
+            for r_index, r_value in enumerate(temp_layer_r):
+                # Now I have something on the right side and I completely don't
+                # care about others.
+                for l_index, l_value in enumerate(neurons[layer]):
+                    to_layer = r_value * self._derivative(layer, l_value) \
+                        * self._connections\
+                        [layer]\
+                        [connection_index(l_index, r_index, layer_size)]
+                    to_neuron = r_value * self._func(layer, l_value)
+                    temp_layer_l[l_index] += to_layer
+                    grad[layer][connection_index(l_index, r_index, layer_size)]\
+                        = to_neuron
+                # bias:    xD
+                grad\
+                    [layer]\
+                    [\
+                        connection_index(len(neurons[layer]),\
+                        r_index,\
+                        layer_size)\
+                        ] = r_value # * 1.0
+
+            temp_layer_r = temp_layer_l
+        return grad
+
+    def get_calculation(self, input_values):
+        """Short form of calculating network."""
+        self.input_set_all(input_values)
+        self.feed()
+        return self.output_get_all()
+
+    def learn(self, input_sets, expectations, gradient_multiplier):
+        """Function that lears our network."""
+        calculated_gradients = []
+        for i, in_set in enumerate(input_sets):
+            self.input_set_all(in_set)
+            self.feed()
+            calculated_gradients.append(self.propagate_back(expectations[i]))
+        gradient = merge_weight_sets(\
+            calculated_gradients,\
+            - gradient_multiplier / len(input_sets)
+            )
+        gradient = merge_weight_sets(\
+            [gradient, self.copy_weights()],\
+            1.0
+            )
+        self.paste_weights(gradient)
+
+def merge_weight_sets(sets, multiplier):
+    """Function that merges multiple weight or gradient sets and multiplies
+them by some number."""
+    #print("merge_weight_sets")
+    #print("multiplier " + str(multiplier))
+    #print("sets size " + str(len(sets)))
+    final_set = []
+    #print("first set layers "+str(len(sets[0])))
+    for layer in sets[0]:
+        final_set.append(layer.copy())
+    #    print("layer size " + str(len(layer)))
+    for i in range(1, len(sets)):
+    #    print("set " + str(i) + " layers " + str(len(sets[i])))
+        for j, layer in enumerate(sets[i]):
+    #        print("layer size " + str(len(layer)))
+            for k, value in enumerate(layer):
+                final_set[j][k] += value
+    for _, layer in enumerate(final_set):
+        for i, _ in enumerate(layer):
+            layer[i] *= multiplier
+    #print("merge_weight_sets end")
+    return final_set
