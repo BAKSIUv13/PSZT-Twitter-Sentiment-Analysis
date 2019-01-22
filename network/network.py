@@ -262,6 +262,12 @@ This list can be saved to file.
         """This function fills input."""
         self.layer_set_all(0, numbers)
 
+    def input_zero(self):
+        """This function sets zero in all input neurons."""
+        self.check_level(NetworkSetupLevel.READY)
+        for i, _ in enumerate(self._neurons[0]):
+            self._neurons[0][i] = 0.0
+
     def input_get_all(self):
         """Returns table of input numbers."""
         self.layer_get_all(0)
@@ -409,6 +415,7 @@ output."""
 
     def get_calculation(self, input_values):
         """Short form of calculating network."""
+        self.input_zero()
         self.input_set_all(input_values)
         self.feed()
         return self.output_get_all()
@@ -417,6 +424,7 @@ output."""
         """Function that learns our network."""
         calculated_gradients = []
         for i, in_set in enumerate(input_sets):
+            self.input_zero()
             self.input_set_all(in_set)
             self.feed()
             calculated_gradients.append(self.propagate_back(expectations[i]))

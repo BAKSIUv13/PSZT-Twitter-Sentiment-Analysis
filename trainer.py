@@ -36,6 +36,18 @@ print(len(TEST_SET_IN))
 print(len(TEST_SET_OUT))
 
 
+<<<<<<< HEAD
+#FILE_NAME = input("Type name of file with network:\n")
+#NETWORK = network_manager.load_network(FILE_NAME)
+
+NETWORK = network_manager.create_random_network(-0.1, 0.5)
+
+utility.full_learning(NETWORK, TRAIN_SET_IN, TRAIN_SET_OUT, 0.018, 30)
+
+FILE_NAME = input("Type name of file with network:\n")
+
+utility.save_to_file(NETWORK, FILE_NAME)
+=======
 FILE_NAME = input("Type name of file with network:\n")
 #utility.load_from_file(NETWORK, FILE_NAME)
 NETWORK = network_manager.load_network(FILE_NAME)
@@ -47,6 +59,7 @@ NETWORK = network_manager.load_network(FILE_NAME)
 #FILE_NAME = input("Type name of file with network:\n")
 
 #utility.save_to_file(NETWORK, FILE_NAME)
+>>>>>>> c19a9acd6dabd97c9ee19b070f6eb22058291032
 #utility.load_from_file(NETWORK, FILE_NAME)
 
 ACCEPTABLE_COST = 0.0003
