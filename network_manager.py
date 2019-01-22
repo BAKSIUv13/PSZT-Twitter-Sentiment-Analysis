@@ -3,11 +3,30 @@
 This network has 3 layers. Their sizes are 280, 20, 2.
 """
 
+import math
+
 from network import network
 from network import utility
 
+
+
 NUMBER_OF_LAYERS = 3
 LAYER_SIZES = [280, 20, 2]
+
+
+
+
+def hidden_func(argus):
+    """Function"""
+    return math.atan(argus)
+
+def hidden_derivative(argus):
+    """Function derivative."""
+    return 1.0 / (argus**2 + 1.0)
+
+
+
+
 
 def create_zero_network():
     """Returns network with zeros in weights."""
@@ -16,6 +35,8 @@ def create_zero_network():
     for i, size in enumerate(LAYER_SIZES):
         net.set_layer_size(i, size)
     net.init_with_zeros()
+    net.set_function(0, hidden_func)
+    net.set_derivative(0, hidden_derivative)
     return net
 
 def create_random_network(min_value, max_value):
