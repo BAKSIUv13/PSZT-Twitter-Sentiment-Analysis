@@ -336,6 +336,17 @@ can be used to learn this network.
         self.check_level(NetworkSetupLevel.READY)
         return self._propagate_gradient(wanted_output)
 
+    def calculate_cost(self, wanted_output):
+        """This function calculates cost of already calculated output and
+wanted values.
+"""
+        the_cost = 0.0
+        for i, value in enumerate(self._neurons[self._number_of_layers - 1]):
+            the_cost += cost(value, wanted_output[i])
+            print("got:{:1.6f}  wanted:{:1.6f}".format(value, wanted_output[i]))
+        print("Cost: {:1.6f}".format(the_cost))
+        return the_cost
+
     def _create_empty_gradient(self):
         """This function creates a zero gradient for other functions."""
         number_of_layers = self._number_of_layers
@@ -409,6 +420,8 @@ output."""
             self.input_set_all(in_set)
             self.feed()
             calculated_gradients.append(self.propagate_back(expectations[i]))
+            if i % 200 == 0:
+                print("Propagated gradient no. {:3}".format(i))
         gradient = merge_weight_sets(\
             calculated_gradients,\
             - gradient_multiplier / len(input_sets)
@@ -417,6 +430,7 @@ output."""
             [gradient, self.copy_weights()],\
             1.0
             )
+        print("Merged propagated gradients.")
         self.paste_weights(gradient)
 
     def look_for_nans(self):

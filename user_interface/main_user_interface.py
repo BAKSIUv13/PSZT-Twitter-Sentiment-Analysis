@@ -10,7 +10,8 @@ class MainUserInterface:
 
     def __init__(self, secret_one, secret_two):
         # TODO
-        self._neural_network = network_manager.create_zero_network()
+        #self._neural_network = network_manager.create_zero_network()
+        self._neural_network = network_manager.load_network("network_values.txt")
         self._secret_one = secret_one
         self._secret_two = secret_two
 
