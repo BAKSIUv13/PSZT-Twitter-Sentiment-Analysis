@@ -14,11 +14,13 @@ class MainUserInterface:
         self._secret_one = secret_one
         self._secret_two = secret_two
 
-    def check_hashtag(self, hashtag):
+    def check_hashtag(self, hashtag, number_of_tweets, tweets_type):
         """Check sentiment."""
 
         tweets = (get_tweets.Tweets(self._secret_one, self._secret_two)
-                  .get_tweets(hashtag, tweet_counter=100))
+                  .get_tweets(hashtag,
+                              number_of_tweets,
+                              tweets_type))
         clean_tweets = cleanup.clean_tweets(tweets)
         sentimated_tweets = sentiment.convert_tweets(clean_tweets)
 
