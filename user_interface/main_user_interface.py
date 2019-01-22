@@ -9,8 +9,7 @@ class MainUserInterface:
     """The class responsible for user interface."""
 
     def __init__(self, secret_one, secret_two):
-        # TODO
-        self._neural_network = network_manager.create_zero_network()
+        self._neural_network = network_manager.load_network("network_values.txt")
         self._secret_one = secret_one
         self._secret_two = secret_two
 
@@ -36,5 +35,5 @@ class MainUserInterface:
         average_positive = sum(positives) / len(positives)
         average_negative = sum(negatives) / len(negatives)
 
-        print(f'Positive: {average_positive}%')
-        print(f'Negative: {average_negative}%')
+        print('Positive: {0}%'.format(str(round(average_positive * 100, 2))))
+        print('Negative: {0}%'.format(str(round(average_negative * 100, 2))))
