@@ -21,11 +21,6 @@ class MainUserInterface:
                   .get_tweets(hashtag,
                               number_of_tweets,
                               tweets_type))
-
-        for tweet in tweets:
-            print(tweet)
-            print()
-            print()
         clean_tweets = cleanup.clean_tweets(tweets)
         sentimated_tweets = sentiment.convert_tweets(clean_tweets)
 
