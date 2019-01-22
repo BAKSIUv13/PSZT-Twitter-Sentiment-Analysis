@@ -33,7 +33,5 @@ class MainUserInterface:
             negatives.append(partial_result[1])
 
         average_positive = sum(positives) / len(positives)
-        average_negative = sum(negatives) / len(negatives)
 
         print('Positive: {0}%'.format(str(round(average_positive * 100, 2))))
-        print('Negative: {0}%'.format(str(round(average_negative * 100, 2))))

@@ -1,15 +1,4 @@
-
-*.o
-*.exe
-*.a
-*.lib
-*.dll
-
-
-.vscode
-
 __pycache__
-
 .vscode/
 PSZT-Twitter-Sentiment-Analysis-env
 __pycache__/

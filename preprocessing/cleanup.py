@@ -14,10 +14,10 @@ def clean_tweets(tweets):
 
     # Stage 0: Load dictionaries
     emoticons_csv = csv.reader(open("preprocessing/emoticons_dictionary.csv"),
-                                    delimiter=",", doublequote=False, quoting=csv.QUOTE_ALL)
+                               delimiter=",", doublequote=False, quoting=csv.QUOTE_ALL)
     emoticons_dict = dict(emoticons_csv)
     contractions_csv = csv.reader(open("preprocessing/contractions_dictionary.csv"),
-                                        delimiter=",", doublequote=False, quoting=csv.QUOTE_ALL)
+                                  delimiter=",", doublequote=False, quoting=csv.QUOTE_ALL)
     contractions_dict = dict(contractions_csv)
 
     for tweet in tweets:
